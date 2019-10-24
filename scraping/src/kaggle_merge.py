@@ -50,5 +50,37 @@ for key in result.keys():
 outfile = open("out_merged.csv", "w")
 writer = csv.writer(outfile)
 
+
+print(result)
+
+
+def is_float(s):
+    try:
+        float(s)
+    except ValueError:
+        return False
+    return True
+
+
+keys_to_remove = []
+for key in result.keys():
+    fields_empty = False
+    for elem in result[key]:
+        if elem == '':
+            fields_empty = True
+            break
+    if fields_empty:
+        keys_to_remove.append(key)
+        continue
+    
+    for i, elem in enumerate(result[key]):
+        if not is_float(elem):
+            if is_float(elem[:-1]):
+                result[key][i] = float(elem[:-1]) * 1000 
+
+for key in keys_to_remove:
+    del result[key]         
+        
+
 for key in result.keys():
     writer.writerow(result[key])
