@@ -15,7 +15,7 @@ fails = 0
 with open("output.csv", "wb") as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(["Name", "Location", "Score", "reviews", "salaries", "interviews"])
-    for i in range(N_start, N):
+    for i in range(N_start, N_start + N):
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko %s) Chrome/50.0.2661.102 Safari/537.36' %
         ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))}
         url = "https://www.glassdoor.com/Reviews/us-reviews-SRCH_IL.0,2_IN1_IP%s.htm" % i
