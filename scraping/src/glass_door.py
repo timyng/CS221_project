@@ -6,8 +6,8 @@ import csv
 from bs4 import BeautifulSoup
 
 
-N = 1200
-N_start = 4850
+N = 10000
+N_start = 0
 global_soup = None
 global_alt = None
 fails = 0
