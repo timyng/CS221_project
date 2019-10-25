@@ -17,9 +17,10 @@ with open(kaggle_path) as csvfile:
     first_kaggle = next(reader)
     for row in reader:
         i+=1
-        #if i > 10000:
+        #if i > 100000:
         #    break
-        data[row[1]] = row
+        if not row[1] in data:
+            data[row[1]] = row
 
 
 
@@ -27,6 +28,7 @@ def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
 result = {}
+
 
 
 label_file = open(glass_door_path)
@@ -42,17 +44,17 @@ first_glass = labels[0]
 #            result[data[0], 0
 #            print(elem, label, sim_score)
 #
-used_names = set()
+
+
 for label in labels:
     s = label[0].strip().lower()
-    if s in data and not s in used_names:
-        used_names.add(s)
-        data[s] = data[s] + label[2:]
-        result[s] = data[s]
+    if s in data and not s in result:
+        tmp = data[s] + label[2:]
+        result[s] = tmp
 
 
-outfile = open("out_merged.csv", "w")
-writer = csv.writer(outfile)
+
+print(result["google"])
 
 
 
@@ -62,7 +64,6 @@ def is_float(s):
     except ValueError:
         return False
     return True
-
 
 keys_to_remove = []
 for key in result.keys():
@@ -83,7 +84,11 @@ for key in keys_to_remove:
     del result[key]         
         
 
+outfile = open("out_merged.csv", "w")
+writer = csv.writer(outfile)
+
 writer.writerow(first_kaggle + first_glass[2:])
 print(first_kaggle, first_glass)
 for key in result.keys():
+    #print("writing", result[key])
     writer.writerow(result[key])
