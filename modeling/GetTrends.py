@@ -28,7 +28,7 @@ csv_header = csv_data[0]
 csv_data[:] = [item[1] for item in csv_data[1:]]
 csv_file.close()
 
-to_range = [500,505]
+to_range = [350,355]
 succeeded = []
 
 for idx,company_name in tqdm(enumerate(csv_data[to_range[0]:to_range[1]])):
@@ -41,13 +41,16 @@ for idx,company_name in tqdm(enumerate(csv_data[to_range[0]:to_range[1]])):
         print("### Exited because Google rejected...")
         pickle.dump(trends_IOT, open("trends_IOT.p", "wb"))
         pickle.dump(trends_REG, open("trends_REG.p", "wb"))
+        pickle.dump(succeeded, open("succeeded.p", "wb"))
 
     trends_IOT = pd.concat([trends_IOT,trends_IOT_new],axis=1) 
     trends_REG = pd.concat([trends_REG,trends_REG_new],axis=1) 
-    del trends_IOT['isPartial']
+    if 'isPartial' in trends_IOT.keys(): del trends_IOT['isPartial']
     # del trends_REG['isPartial']
     succeeded.append(to_range[0]+idx)
     time.sleep(0.5)
 
-
+pickle.dump(trends_IOT, open("trends_IOT.p", "wb"))
+pickle.dump(trends_REG, open("trends_REG.p", "wb"))
+pickle.dump(succeeded, open("succeeded.p", "wb"))
 # ala = pickle.load(open("trends_IOT.p", "rb"))
