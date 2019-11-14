@@ -16,23 +16,32 @@ frame = pd.read_csv(data_path)
 
 #keys = ["market_cap", "revenue", "total employee estimate", "enterprise_value", "stock 52_week", "leveraged_free_cash_flow"]
 #keys = "market_cap,enterprise_value,trailing_pe,forward_pe,peg_ratio_5,price_sales,price_book,enterprise_value_revenue,enterprise_value_ebitda,profit_margin,operating_margin,return_on_assets,return_on_equity,revenue,revenue_per_share,quarterly_revenue_share,gross_profit,ebitda,net_income_avi_to_common,diluted_eps,quarterly_earnings_growth,total_cash,total_cash_per_share,total_dept,total_dept_per_equity,operating_cash_flow,leveraged_free_cash_flow,stock_beta_3y,stock 52_week,stock_sp500_52_week,stock_52_week_high,stock_52_week_low".split(",")
-keys = ["industry"]
 
-X = pd.DataFrame({key : frame[key] for key in keys})
-print(X)
 
-print(len(pd.unique(X["industry"])))
 
-exit(0)
 
-for x in X:
+
+
+
+#
+le = LabelEncoder()
+non_categoriacal_columns = ["market_cap"]
+categorical_columns = ["industry", " state"]
+
+X = pd.DataFrame({key : frame[key] for key in categorical_columns + non_categoriacal_columns})
+X[categorical_columns] = X[categorical_columns].apply(lambda col : le.fit_transform(col))
+
+for x in non_categoriacal_columns:
     X[x] = X[x].fillna(X[x].mean())
 
+indices = [X.columns.get_loc(c) for c in categorical_columns]
+ohe = OneHotEncoder(categorical_features=indices, sparse=False)
+X = ohe.fit_transform(X)
 
 
 Y = pd.DataFrame({"y" : frame["Score"]})
 
-X = pd.DataFrame({"rand" : np.random.random(Y.shape[0])})
+#X = pd.DataFrame({"rand" : np.random.random(Y.shape[0])})
 
 
 reg = LinearRegression().fit(X, Y)
@@ -43,7 +52,7 @@ pred = reg.predict(X)
 
 
 
-print(sum(np.abs(pred - Y.to_numpy()) <  0.1)/ Y.shape[0]) 
+print(sum(np.abs(pred - Y.to_numpy()) <  0.5)/ Y.shape[0]) 
 
 print("mean square error = {}".format(mean_squared_error(Y, pred)))
 
