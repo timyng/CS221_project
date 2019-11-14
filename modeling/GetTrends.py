@@ -25,10 +25,10 @@ line_count = 0
 csv_data = [item for item in csv_reader]
 csv_file.close()
 csv_header = csv_data[0]
-csv_data[:] = [item[1] for item in csv_data[1:]]
+csv_data[:] = [item[0] for item in csv_data[1:]]
 csv_file.close()
 
-to_range = [350,355]
+to_range = [2000,3000]
 succeeded = []
 
 for idx,company_name in tqdm(enumerate(csv_data[to_range[0]:to_range[1]])):
