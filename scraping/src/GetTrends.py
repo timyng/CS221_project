@@ -63,7 +63,7 @@ for idx,company_name in tqdm(enumerate(csv_data[to_range[0]:to_range[1]])):
         pickle.dump(trends_IOT, open("trends_IOT_"+substring, "wb"))
         pickle.dump(trends_REG, open("trends_REG_"+substring, "wb"))
         pickle.dump(succeeded, open("succeeded_"+substring, "wb"))
-        print("## Saved {}!".format(to_range[0]+1))
+        print("## Saved {}!".format(to_range[1]+1))
 
 pickle.dump(trends_IOT, open("trends_IOT_"+substring, "wb"))
 pickle.dump(trends_REG, open("trends_REG_"+substring, "wb"))
