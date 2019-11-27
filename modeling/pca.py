@@ -48,7 +48,7 @@ def plot_heat(X, y_data):
     z = z / c
     print(z.shape)
     z = z[:-1, :-1]
-    z_min, z_max = 1900, 2000
+    z_min, z_max = 1, 5
 
     fig, ax = plt.subplots()
     color_map = plt.get_cmap("hsv", 256)

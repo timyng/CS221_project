@@ -33,7 +33,12 @@ def convert_data(data):
         return float(data[0:-1]) * 10 ** 3
     if data == "N/A":
         return "NaN"
-    return float(data)
+    ret = None
+    try:
+        ret = float(data)
+    except ValueError:
+        ret = "NaN"
+    return ret
 
 def clean_data(X):
     return X.applymap(convert_data)
@@ -80,7 +85,7 @@ Y = "Score"
 
 def get_all_non_categorical():
     all =  ['year founded', 'current employee estimate', 'reviews', 'salaries', 'interviews','total employee estimate','Score', 'market_cap', 'enterprise_value', 'trailing_pe', 'forward_pe', 'peg_ratio_5', 'price_sales', 'price_book', 'enterprise_value_revenue', 'enterprise_value_ebitda', 'profit_margin', 'operating_margin', 'return_on_assets', 'return_on_equity', 'revenue',
-                           'revenue_per_share', 'quarterly_revenue_share', 'gross_profit', 'ebitda', 'net_income_avi_to_common', 'diluted_eps', 'quarterly_earnings_growth', 'total_cash', 'total_cash_per_share', 'total_dept', 'total_dept_per_equity', 'operating_cash_flow', 'leveraged_free_cash_flow', 'stock_beta_3y', 'stock 52_week', 'stock_sp500_52_week', 'stock_52_week_high', 'stock_52_week_low', "website_rank", "organic_traffic", "traffic_cost"]
+                           'revenue_per_share', 'quarterly_revenue_share', 'gross_profit', 'ebitda', 'net_income_avi_to_common', 'diluted_eps', 'quarterly_earnings_growth', 'total_cash', 'total_cash_per_share', 'total_dept', 'total_dept_per_equity', 'operating_cash_flow', 'leveraged_free_cash_flow', 'stock_beta_3y', 'stock 52_week', 'stock_sp500_52_week', 'stock_52_week_high', 'stock_52_week_low', "website_rank", "organic_traffic", "traffic_cost", "linkedin_followers"]
 
     all.remove(Y)
     return all
@@ -89,7 +94,7 @@ def get_all_categorical():
     return ['industry', 'size range', 'city', ' state', 'country']
 
 
-def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_data_webclicks.csv",
+def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_data_webclicks_linkedin.csv",
  normalize=False, binary_encode=False, trend_features = True):
 
     

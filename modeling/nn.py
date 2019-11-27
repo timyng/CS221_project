@@ -63,8 +63,9 @@ def accuracy(pred, truth, k = 0.25):
     return np.sum(np.abs(pred - truth) < k) / pred.shape[0]
 
 
+ModelParams = namedtuple("Model", ['non_categorical', 'categorical', 'binary_encode', 'use_trends', 'nn','nn_args', 'weight_decay', "lr", "name"])
+
 def model_p_37_5():
-    ModelParams = namedtuple("Model", ['non_categorical', 'categorical', 'binary_encode', 'use_trends', 'nn','nn_args', 'weight_decay', "lr", "name"])
 
 
     categorical = ["industry", " state", "size range"]
@@ -81,6 +82,24 @@ def model_p_37_5():
                     weight_decay = 0.03,
                     lr = 0.01,
                     name = "model_37_5")
+
+
+def model_linkedin():
+   
+    categorical = ["industry", " state"]
+    non_categorical = ["linkedin_followers", 'year founded', 'current employee estimate', 'reviews', 'salaries', 'interviews','total employee estimate', 'market_cap', 'enterprise_value', 'trailing_pe', 'forward_pe', 'peg_ratio_5', 'price_sales', 'price_book', 'enterprise_value_revenue', 'enterprise_value_ebitda', 'profit_margin', 'operating_margin', 'return_on_assets', 'return_on_equity', 'revenue',
+                           'revenue_per_share', 'quarterly_revenue_share', 'gross_profit', 'ebitda', 'net_income_avi_to_common', 'diluted_eps', 'quarterly_earnings_growth', 'total_cash', 'total_cash_per_share', 'total_dept', 'total_dept_per_equity', 'operating_cash_flow', 'leveraged_free_cash_flow', 'stock_beta_3y', 'stock 52_week', 'stock_sp500_52_week', 'stock_52_week_high', 'stock_52_week_low']
+    
+    net_args = [[90, 50]]
+    return ModelParams(categorical = categorical ,
+                    non_categorical = non_categorical,
+                    binary_encode = True,
+                    use_trends = True,
+                    nn = Net2,
+                    nn_args = net_args,
+                    weight_decay = 0.03,
+                    lr = 0.01,
+                    name = "linkedin")
 
 def train_model_with_parapeters(model_p, save_stats  = True):
 
@@ -142,7 +161,7 @@ def train_model_with_parapeters(model_p, save_stats  = True):
     plt.ylim(0,.6)
     plt.legend()
     plt.title(model_p.name)
-    plt.savefig("nn_dev_acc_loss.png")
+    plt.savefig("nn_{}.png".format(model_p.name))
     plt.show()
 
 
@@ -150,7 +169,7 @@ def train_model_with_parapeters(model_p, save_stats  = True):
 def main():
     torch.manual_seed(1)
 
-    model_params = [model_p_37_5()]
+    model_params = [model_p_37_5(), model_linkedin()]
 
     for model_p in model_params:
         train_model_with_parapeters(model_p)
