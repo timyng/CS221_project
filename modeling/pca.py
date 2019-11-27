@@ -29,7 +29,7 @@ def plot_heat(X, y_data):
     y, x = np.meshgrid(np.linspace(x_min, x_max, K), np.linspace(y_min, y_max, K))
 
     z = np.zeros([K, K])
-    c = np.ones([K, K])
+    c = np.ones([K, K]) * 00000000.1
 
     width = x_max - x_min
     height = y_max - y_min
@@ -55,8 +55,9 @@ def plot_heat(X, y_data):
 
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     fig.colorbar(c, ax=ax)
-    plt.show()
     plt.savefig("heatmap.png")
+    plt.show()
+    
 
 
 def save_scatter(X, y, name, ran = None):
@@ -93,6 +94,18 @@ def remove_outliers(X, y, m = 2):
     indices_1 = abs(X[:,1] - np.mean(X[:,1])) < m * np.std(X[:,1])
     indices = indices_0 + indices_1
     return (X[indices], y.to_numpy()[indices]) 
+
+
+def y_vs_trends(X, y):
+
+    names = ["avg5_us", "avg_2", "avg_1"]
+
+    for name in names:
+        plt.figure()
+        plt.title(name)
+        plt.scatter(X[name].to_numpy(), y.to_numpy())
+        plt.savefig("{}.png".format(name))
+        plt.close()
     
 
 
@@ -104,16 +117,14 @@ def main():
     X_train, y_train, X_dev, y_dev, X_test, y_test = load_and_clean(
         non_categorical, categorical, normalize = True, binary_encode = True, trend_features = True)
 
-    #print(X_train)
+  
     pca = PCA(n_components=2)
     pca.fit(X_train)
     PCA_train_X = pca.transform(X_train)
 
-    #X_f, y_f =  remove_outliers(PCA_train_X, y_train, m = 1)
-    #print(X_f.shape, y_f.shape)
-
+ 
+    y_vs_trends(X_train, y_train)
     plot_heat(PCA_train_X, y_train.to_numpy())
-
     print_pca_info(pca, X_train)
     
     return
