@@ -12,8 +12,31 @@ def remove_nan(X, non_c_features):
         X[x] = X[x].fillna(X[x].mean())
 
 
-def sig_inverse(y):
-    return np.log(y / (1-y))
+
+
+
+def convert_data(data):
+  
+    if isinstance(data, (float, int)): #if the data already is number, we don't have to do anything
+        return data
+    data = data.replace(",","")
+    data = data.replace("$", "")
+    if data.endswith("%"):
+        return float(data[0:-1])  / 100.0
+    if data.endswith("T"):
+        return float(data[0:-1]) * 10 ** 12
+    if data.endswith("B"):
+        return float(data[0:-1]) * 10 ** 9
+    if data.endswith("M"):
+        return float(data[0:-1]) * 10 ** 6
+    if data.endswith("K"):
+        return float(data[0:-1]) * 10 ** 3
+    if data == "N/A":
+        return "NaN"
+    return float(data)
+
+def clean_data(X):
+    return X.applymap(convert_data)
 
 
 def google_trends_features():
@@ -53,13 +76,27 @@ def google_trends_features():
     return pd.DataFrame(result_dict)
 
 
-def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_data.csv",
+Y = "Score"
+
+def get_all_non_categorical():
+    all =  ['year founded', 'current employee estimate', 'reviews', 'salaries', 'interviews','total employee estimate','Score', 'market_cap', 'enterprise_value', 'trailing_pe', 'forward_pe', 'peg_ratio_5', 'price_sales', 'price_book', 'enterprise_value_revenue', 'enterprise_value_ebitda', 'profit_margin', 'operating_margin', 'return_on_assets', 'return_on_equity', 'revenue',
+                           'revenue_per_share', 'quarterly_revenue_share', 'gross_profit', 'ebitda', 'net_income_avi_to_common', 'diluted_eps', 'quarterly_earnings_growth', 'total_cash', 'total_cash_per_share', 'total_dept', 'total_dept_per_equity', 'operating_cash_flow', 'leveraged_free_cash_flow', 'stock_beta_3y', 'stock 52_week', 'stock_sp500_52_week', 'stock_52_week_high', 'stock_52_week_low', "website_rank", "organic_traffic", "traffic_cost"]
+
+    all.remove(Y)
+    return all
+
+def get_all_categorical():
+    return ['industry', 'size range', 'city', ' state', 'country']
+
+
+def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_data_webclicks.csv",
  normalize=False, binary_encode=False, trend_features = True):
 
+    
+
     frame = pd.read_csv(data_path)
-    all_non_categorical = ['year founded', 'current employee estimate', 'total employee estimate', 'reviews', 'salaries', 'interviews', 'market_cap', 'enterprise_value', 'trailing_pe', 'forward_pe', 'peg_ratio_5', 'price_sales', 'price_book', 'enterprise_value_revenue', 'enterprise_value_ebitda', 'profit_margin', 'operating_margin', 'return_on_assets', 'return_on_equity', 'revenue',
-                           'revenue_per_share', 'quarterly_revenue_share', 'gross_profit', 'ebitda', 'net_income_avi_to_common', 'diluted_eps', 'quarterly_earnings_growth', 'total_cash', 'total_cash_per_share', 'total_dept', 'total_dept_per_equity', 'operating_cash_flow', 'leveraged_free_cash_flow', 'stock_beta_3y', 'stock 52_week', 'stock_sp500_52_week', 'stock_52_week_high', 'stock_52_week_low']
-    all_categorical = ['industry', 'size range', 'city', ' state', 'country']
+    all_non_categorical = get_all_non_categorical()
+    all_categorical = get_all_categorical()
 
     for non_c in non_categorical:
         if non_c not in all_non_categorical:
@@ -76,7 +113,8 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
         X = pd.concat([X, google_trends_features()], axis = 1)
 
     #X = pd.concat([X, ce_binary.fit_transform(X)])
-    y = frame[['Score']]
+    #y = frame[['Score']]
+    y = frame[[Y]]
     for cat in categorical:
         new_cols = None
         if binary_encode:
@@ -85,6 +123,7 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
         else:
             new_cols = pd.get_dummies(frame[cat], prefix='category')
         X = pd.concat([X, new_cols], axis=1)
+    X = clean_data(X)
     remove_nan(X, non_categorical)
 
     if (normalize):
@@ -99,4 +138,4 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
 
 
 if __name__ == "__main__":
-    print(load_and_clean(["year founded"],[])[0])
+    print(load_and_clean(["website_rank", "year founded"],[])[0])

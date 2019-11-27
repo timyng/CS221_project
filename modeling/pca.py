@@ -10,7 +10,11 @@ from load_data import *
 from sklearn.decomposition import PCA
 import seaborn as sb
 import matplotlib.colors as col
+import os
 
+
+
+OUT_FOLDER = "out"
 
 def convertToClass(Y, k):
     return Y.apply(lambda elem : np.round(elem * k / 5))
@@ -44,7 +48,7 @@ def plot_heat(X, y_data):
     z = z / c
     print(z.shape)
     z = z[:-1, :-1]
-    z_min, z_max = 1, 5
+    z_min, z_max = 1900, 2000
 
     fig, ax = plt.subplots()
     color_map = plt.get_cmap("hsv", 256)
@@ -55,7 +59,7 @@ def plot_heat(X, y_data):
 
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     fig.colorbar(c, ax=ax)
-    plt.savefig("heatmap.png")
+    plt.savefig("{}/heatmap.png".format(OUT_FOLDER))
     plt.show()
     
 
@@ -75,7 +79,7 @@ def save_scatter(X, y, name, ran = None):
         plt.scatter(X[:,0][indices], X[:,1][indices], c = "red", cmap=plt.cm.coolwarm)
     else:
         plt.scatter(X[:,0], X[:,1], c = color, cmap=plt.cm.coolwarm)
-    plt.savefig("./{}.png".format(name))
+    plt.savefig("{}/{}.png".format(OUT_FOLDER,name))
     plt.show()
     plt.close()
 
@@ -96,24 +100,24 @@ def remove_outliers(X, y, m = 2):
     return (X[indices], y.to_numpy()[indices]) 
 
 
-def y_vs_trends(X, y):
-
-    names = ["avg5_us", "avg_2", "avg_1"]
-
-    for name in names:
+def X_vs_y(X, y, cols):
+    for name in cols:
         plt.figure()
         plt.title(name)
         plt.scatter(X[name].to_numpy(), y.to_numpy())
-        plt.savefig("{}.png".format(name))
+        plt.savefig("{}/{}.png".format(OUT_FOLDER, name))
         plt.close()
     
 
 
 def main():
+
+    if not os.path.exists(OUT_FOLDER):
+        os.makedirs(OUT_FOLDER)
+
     categorical = []
     #non_categorical = ["year "]
-    non_categorical = ['year founded', 'current employee estimate', 'total employee estimate', 'reviews', 'salaries', 'interviews', 'market_cap', 'enterprise_value', 'trailing_pe', 'forward_pe', 'peg_ratio_5', 'price_sales', 'price_book', 'enterprise_value_revenue', 'enterprise_value_ebitda', 'profit_margin', 'operating_margin', 'return_on_assets', 'return_on_equity', 'revenue',
-                           'revenue_per_share', 'quarterly_revenue_share', 'gross_profit', 'ebitda', 'net_income_avi_to_common', 'diluted_eps', 'quarterly_earnings_growth', 'total_cash', 'total_cash_per_share', 'total_dept', 'total_dept_per_equity', 'operating_cash_flow', 'leveraged_free_cash_flow', 'stock_beta_3y', 'stock 52_week', 'stock_sp500_52_week', 'stock_52_week_high', 'stock_52_week_low']
+    non_categorical = get_all_non_categorical()
     X_train, y_train, X_dev, y_dev, X_test, y_test = load_and_clean(
         non_categorical, categorical, normalize = True, binary_encode = True, trend_features = True)
 
@@ -123,7 +127,7 @@ def main():
     PCA_train_X = pca.transform(X_train)
 
  
-    y_vs_trends(X_train, y_train)
+    X_vs_y(X_train, y_train, X_train.columns)
     plot_heat(PCA_train_X, y_train.to_numpy())
     print_pca_info(pca, X_train)
     
