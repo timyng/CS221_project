@@ -131,6 +131,13 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
     X = clean_data(X)
     remove_nan(X, non_categorical)
 
+    remove_small = True
+    if remove_small:
+        indices = X["current employee estimate"] > 500
+        X = X[indices]
+        y = y[indices]
+        
+    print(y["Score"].value_counts())
     if (normalize):
         X.loc[:, :] = preprocessing.StandardScaler().fit_transform(X)
 
@@ -141,6 +148,10 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
 
     return (X_train, y_train, X_dev, y_dev, X_test, y_test)
 
+def convert_to_class(y_data, k):
+    eps = 0.001
+    return y_data.apply(lambda x : np.floor(x / 5  * k - eps).astype(int))
+
 
 if __name__ == "__main__":
-    print(load_and_clean(["website_rank", "year founded"],[])[0])
+    print(load_and_clean(["current employee estimate", "year founded"],[])[0].shape)
