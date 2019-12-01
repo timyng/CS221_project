@@ -115,8 +115,6 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
         trends_data = google_trends_features()
         X = pd.concat([X, google_trends_features()], axis = 1)
 
-    #X = pd.concat([X, ce_binary.fit_transform(X)])
-    #y = frame[['Score']]
     y = frame[[Y]]
     for cat in categorical:
         new_cols = None
@@ -129,13 +127,11 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
     X = clean_data(X)
     remove_nan(X, non_categorical)
 
-
     if filter:
         indices = X["current employee estimate"] > 300
         X = X[indices]
         y = y[indices]
         
-    print(y["Score"].value_counts())
     if (normalize):
         X.loc[:, :] = preprocessing.StandardScaler().fit_transform(X)
 
