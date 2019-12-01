@@ -133,7 +133,7 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
 
     remove_small = True
     if remove_small:
-        indices = X["current employee estimate"] > 500
+        indices = X["current employee estimate"] > 300
         X = X[indices]
         y = y[indices]
         
