@@ -95,9 +95,7 @@ def get_all_categorical():
 
 
 def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_data_webclicks_linkedin.csv",
- normalize=False, binary_encode=False, trend_features = True):
-
-    
+ normalize=False, binary_encode=False, trend_features = True, filter = False):
 
     frame = pd.read_csv(data_path)
     all_non_categorical = get_all_non_categorical()
@@ -131,8 +129,8 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
     X = clean_data(X)
     remove_nan(X, non_categorical)
 
-    remove_small = True
-    if remove_small:
+
+    if filter:
         indices = X["current employee estimate"] > 300
         X = X[indices]
         y = y[indices]
