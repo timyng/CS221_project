@@ -59,54 +59,68 @@ def evaluateClassificationModel(model, x, y):
     # print("")
     return (accuracy, confusion_m)
 
-def linearRegression_L1(x_train, y_train, x_test, y_test, alpha=0.1):
+def linearRegression_L1(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, alpha=0.1):
 	reg = linear_model.Lasso(alpha=alpha)
 	reg.fit(x_train, y_train)
 	print("LINEAR REGRESSION L1")
 	print("On Training Data:")
-	mse, accuracy, confusion_m = evaluateRegressionModel(reg, x_train, y_train)
-	print("training accuracy: " + str(accuracy))
-	print("training MSE: " + str(mse))
+	mse_train, accuracy_train, confusion_m_train = evaluateRegressionModel(reg, x_train, y_train)
+	print("training accuracy: " + str(accuracy_train))
+	print("training MSE: " + str(mse_train))
 
-	print("ON Test Data:")
-	mse, accuracy, confusion_m = evaluateRegressionModel(reg, x_test, y_test)
-	print("testing accuracy: " + str(accuracy))
-	print("testing MSE: " + str(mse))
+	print("On Dev Data:")
+	mse_dev, accuracy_dev, confusion_m_dev = evaluateRegressionModel(reg, x_test, y_test)
+	print("testing accuracy: " + str(accuracy_dev))
+	print("testing MSE: " + str(mse_dev))
 
-	return reg
+	print("On Test Data")
+	mse_test, accuracy_test, confusion_m_test = evaluateRegressionModel(reg, x_test_unseen, y_test_unseen)
+	print("testing unseen accuracy: " + str(accuracy_test))
+	print("testing unseen MSE: " + str(mse_test))
 
-def linearRegression_L2(x_train, y_train, x_test, y_test, alpha=1.0):
+	return reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev, mse_test, accuracy_test, confusion_m_test
+
+def linearRegression_L2(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, alpha=1.0):
 	reg = linear_model.Ridge(alpha=alpha)
 	reg.fit(x_train, y_train)
 	print("LINEAR REGRESSION L2")
-	mse, accuracy, confusion_m = evaluateRegressionModel(reg, x_train, y_train)
-	print("training accuracy: " + str(accuracy))
-	print("training MSE: " + str(mse))
+	print("On Training Data:")
+	mse_train, accuracy_train, confusion_m_train = evaluateRegressionModel(reg, x_train, y_train)
+	print("training accuracy: " + str(accuracy_train))
+	print("training MSE: " + str(mse_train))
 
-	print("ON Test Data:")
-	mse, accuracy, confusion_m = evaluateRegressionModel(reg, x_test, y_test)
-	print("testing accuracy: " + str(accuracy))
-	print("testing MSE: " + str(mse))
+	print("On Dev Data:")
+	mse_dev, accuracy_dev, confusion_m_dev = evaluateRegressionModel(reg, x_test, y_test)
+	print("testing accuracy: " + str(accuracy_dev))
+	print("testing MSE: " + str(mse_dev))
 
-	return reg
+	print("On Test Data")
+	mse_test, accuracy_test, confusion_m_test = evaluateRegressionModel(reg, x_test_unseen, y_test_unseen)
+	print("testing unseen accuracy: " + str(accuracy_test))
+	print("testing unseen MSE: " + str(mse_test))
+	return reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev, mse_test, accuracy_test, confusion_m_test
 
-def linearRegression(x_train, y_train, x_test, y_test):
+def linearRegression(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen):
 	reg = LinearRegression()
 	reg.fit(x_train, y_train)
 	print("LINEAR REGRESSION")
 	print("On Training Data:")
-	mse, accuracy, confusion_m = evaluateRegressionModel(reg, x_train, y_train)
-	print("training accuracy: " + str(accuracy))
-	print("training MSE: " + str(mse))
+	mse_train, accuracy_train, confusion_m_train = evaluateRegressionModel(reg, x_train, y_train)
+	print("training accuracy: " + str(accuracy_train))
+	print("training MSE: " + str(mse_train))
 
-	print("On Test Data:")
-	mse, accuracy, confusion_m = evaluateRegressionModel(reg, x_test, y_test)
-	print("testing accuracy: " + str(accuracy))
-	print("testing MSE: " + str(mse))
+	print("On Dev Data:")
+	mse_dev, accuracy_dev, confusion_m_dev = evaluateRegressionModel(reg, x_test, y_test)
+	print("testing accuracy: " + str(accuracy_dev))
+	print("testing MSE: " + str(mse_dev))
 
-	return reg
+	print("On Test Data")
+	mse_test, accuracy_test, confusion_m_test = evaluateRegressionModel(reg, x_test_unseen, y_test_unseen)
+	print("testing unseen accuracy: " + str(accuracy_test))
+	print("testing unseen MSE: " + str(mse_test))
+	return reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev, mse_test, accuracy_test, confusion_m_test
 
-def supportVectorRegression(x_train, y_train, x_test, y_test, C=0.1, kernel='rbf', epsilon=0.1, shrinking=True):
+def supportVectorRegression(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, C=0.1, kernel='rbf', epsilon=0.1, shrinking=True):
 	reg = SVR(C=C, kernel=kernel, epsilon=epsilon, shrinking=shrinking)
 	reg.fit(x_train, y_train)
 	print("SUPPORT VECTOR REGRESSION")
@@ -115,21 +129,52 @@ def supportVectorRegression(x_train, y_train, x_test, y_test, C=0.1, kernel='rbf
 	print("training accuracy: " + str(accuracy_train))
 	print("training MSE: " + str(mse_train))
 
-	print("On Test Data:")
+
+	print("On Dev Data:")
 	mse_dev, accuracy_dev, confusion_m_dev = evaluateRegressionModel(reg, x_test, y_test)
 	print("testing accuracy: " + str(accuracy_dev))
 	print("testing MSE: " + str(mse_dev))
 
-	return reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev
+	print("On Test Data")
+	mse_test, accuracy_test, confusion_m_test = evaluateRegressionModel(reg, x_test_unseen, y_test_unseen)
+	print("testing unseen accuracy: " + str(accuracy_test))
+	print("testing unseen MSE: " + str(mse_test))
+	return reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev, mse_test, accuracy_test, confusion_m_test
 
-def softmax(x_train, y_train, x_test, y_test, penalty='l2', C=1.0):
+def supportVectorRegressionPCA(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, C=0.1, kernel='rbf', epsilon=0.1, shrinking=True, n_components=5):
+	pca = PCA(n_components=n_components)
+	x_train = pca.fit_transform(x_train)
+	x_test = pca.transform(x_test)
+	
+	reg = SVR(C=C, kernel=kernel, epsilon=epsilon, shrinking=shrinking)
+	reg.fit(x_train, y_train)
+	print("SUPPORT VECTOR REGRESSION WITH PCA")
+	print("On Training Data:")
+	mse_train, accuracy_train, confusion_m_train = evaluateRegressionModel(reg, x_train, y_train)
+	print("training accuracy: " + str(accuracy_train))
+	print("training MSE: " + str(mse_train))
+
+	print("On Dev Data:")
+	mse_dev, accuracy_dev, confusion_m_dev = evaluateRegressionModel(reg, x_test, y_test)
+	print("testing accuracy: " + str(accuracy_dev))
+	print("testing MSE: " + str(mse_dev))
+
+	print("On Test Data")
+	mse_test, accuracy_test, confusion_m_test = evaluateRegressionModel(reg, x_test_unseen, y_test_unseen)
+	print("testing unseen accuracy: " + str(accuracy_test))
+	print("testing unseen MSE: " + str(mse_test))
+	return reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev, mse_test, accuracy_test, confusion_m_test
+
+def softmax(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, penalty='l2', C=1.0):
 	clf = LogisticRegression(multi_class='multinomial', solver='lbfgs', C=C)
 	clf.fit(x_train, y_train)
 	print("SOFTMAX")
 	accuracy, confusion_m = evaluateClassificationModel(clf, x_train, y_train)
 	print("training accuracy: " + str(accuracy))
 	accuracy, confusion_m = evaluateClassificationModel(clf, x_test, y_test)
-	print("testing accuracy: " + str(accuracy))
+	print("dev accuracy: " + str(accuracy))
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_test_unseen, y_test_unseen)
+	print("test accuracy: " + str(accuracy))
 
 	return clf
 
@@ -155,14 +200,16 @@ def decisionTree(x_train, y_train, x_test, y_test, max_depth = 15):
 
 	return clf
 
-def linearDiscriminantAnalysis(x_train, y_train, x_test, y_test):
+def linearDiscriminantAnalysis(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen):
 	clf = LinearDiscriminantAnalysis()
 	clf.fit(x_train, y_train)
 	print("LINEAR DISCRIMINANT ANALYSIS")
 	accuracy, confusion_m = evaluateClassificationModel(clf, x_train, y_train)
 	print("training accuracy: " + str(accuracy))
 	accuracy, confusion_m = evaluateClassificationModel(clf, x_test, y_test)
-	print("testing accuracy: " + str(accuracy))
+	print("dev accuracy: " + str(accuracy))
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_test_unseen, y_test_unseen)
+	print("test accuracy: " + str(accuracy))
 
 	return clf
 
@@ -184,12 +231,12 @@ def svm_pca(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=.8
 	clf = SVC(gamma = gamma, kernel=kernel, C=C)
 	clf.fit(x_train_new, y_train)
 	print("SUPPORT VECTOR MACHINE WITH PCA")
-	accuracy, confusion_m = evaluateClassificationModel(clf, x_train_new, y_train)
-	print("training accuracy: " + str(accuracy))
-	accuracy, confusion_m = evaluateClassificationModel(clf, x_test_new, y_test)
-	print("testing accuracy: " + str(accuracy))
+	train_accuracy, train_confusion_m = evaluateClassificationModel(clf, x_train_new, y_train)
+	print("training accuracy: " + str(train_accuracy))
+	dev_accuracy, dev_confusion_m = evaluateClassificationModel(clf, x_test_new, y_test)
+	print("testing accuracy: " + str(dev_accuracy))
 
-	return clf
+	return clf, train_accuracy, train_confusion_m, dev_accuracy, dev_confusion_m
 
 def main(normalize=False, binary_encode=False, filter=False):
 	non_categorical_columns = get_all_non_categorical()
@@ -199,39 +246,25 @@ def main(normalize=False, binary_encode=False, filter=False):
 		normalize=normalize, binary_encode=binary_encode, filter=filter)
 	# Run Models
 	# REGRESSION
-	# linearRegression(x_train, y_train, x_test, y_test)
-	# linearRegression_L2(x_train, y_train, x_test, y_test, alpha=1.0)
-	# linearRegression_L1(x_train, y_train, x_test, y_test, alpha=0.1)
-	c_list = [0.01, 0.1, 0.2, 0.3, 0.5, .7, 0.75, 0.8, 0.85, .9, 0.95, 1, 1.5, 2]
-	dev_accuracy_list = []
-	train_accuracy_list = []
-	for c in c_list:
-		print("--------------------------------------------------")
-		print(c)
-		reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev = supportVectorRegression(x_train, y_train, x_test, y_test, C=c, kernel='rbf', epsilon=0.1, shrinking=True)
-		dev_accuracy_list.append(accuracy_dev)
-		train_accuracy_list.append(accuracy_train)
-		print("--------------------------------------------------")
-	plt.figure()
-	plt.plot(c_list, dev_accuracy_list, label = "Dev Accuracy")
-	plt.plot(c_list, train_accuracy_list, label = "Train Accuracy")
-	plt.legend()
-	#plt.ylim(0, 0.6)
-	plt.title("Support Vector Regression: Penalty Parameter vs. Accuracy")
-	plt.savefig("SupportVectorRegression_C_vs_Accuracy")
-	plt.xlabel("Penalty parameter C")
-	plt.show()
+	# linearRegression(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen)
+	# linearRegression_L2(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, alpha=0.)
+	# linearRegression_L1(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, alpha=0.005)
+	# supportVectorRegression(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, C=1.0, kernel='rbf', epsilon=0.1, shrinking=True) # TO DO: w One Hot Encoding, w no Normalization
+	# supportVectorRegression(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, C=0.1, kernel='rbf', epsilon=0.1, shrinking=True)
+	# supportVectorRegression(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen, C=0.1, kernel='linear', epsilon=0.1, shrinking=True)
+
 	# CLASSIFICATION
 	k = 10
 	y_train = convertToClass(y_train, k)
 	y_test = convertToClass(y_test, k)
 	y_test_unseen = convertToClass(y_test_unseen, k)
 	# Run Models
-	# softmax(x_train, y_train, x_test, y_test, penalty='l2', C=1.0)
-	# svm(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=.8)
-	# decisionTree(x_train, y_train, x_test, y_test, max_depth = 15)
-	# linearDiscriminantAnalysis(x_train, y_train, x_test, y_test)
-	# knn(x_train, y_train, x_test, y_test, n_neighbors=20)
-	# svm_pca(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=.8, n_components=5)
+	# softmax(x_train, y_train, x_test, y_test, penalty='l1', C=0.8)
+	# svm(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=1.5)
+	# svm(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='linear', C=0.01)
+	# decisionTree(x_train, y_train, x_test, y_test, max_depth = 14)
+	# linearDiscriminantAnalysis(x_train, y_train, x_test, y_test, x_test_unseen, y_test_unseen)
+	# knn(x_train, y_train, x_test, y_test, n_neighbors=35)
+	# svm_pca(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=1.0, n_components=5)
 
 main(normalize=True, binary_encode=True, filter=True)
