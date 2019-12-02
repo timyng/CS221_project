@@ -106,6 +106,91 @@ def linearRegression(x_train, y_train, x_test, y_test):
 
 	return reg
 
+def supportVectorRegression(x_train, y_train, x_test, y_test, C=0.1, kernel='rbf', epsilon=0.1, shrinking=True):
+	reg = SVR(C=C, kernel=kernel, epsilon=epsilon, shrinking=shrinking)
+	reg.fit(x_train, y_train)
+	print("SUPPORT VECTOR REGRESSION")
+	print("On Training Data:")
+	mse_train, accuracy_train, confusion_m_train = evaluateRegressionModel(reg, x_train, y_train)
+	print("training accuracy: " + str(accuracy_train))
+	print("training MSE: " + str(mse_train))
+
+	print("On Test Data:")
+	mse_dev, accuracy_dev, confusion_m_dev = evaluateRegressionModel(reg, x_test, y_test)
+	print("testing accuracy: " + str(accuracy_dev))
+	print("testing MSE: " + str(mse_dev))
+
+	return reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev
+
+def softmax(x_train, y_train, x_test, y_test, penalty='l2', C=1.0):
+	clf = LogisticRegression(multi_class='multinomial', solver='lbfgs', C=C)
+	clf.fit(x_train, y_train)
+	print("SOFTMAX")
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_train, y_train)
+	print("training accuracy: " + str(accuracy))
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_test, y_test)
+	print("testing accuracy: " + str(accuracy))
+
+	return clf
+
+def svm(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=.8):
+	clf = SVC(gamma = gamma, kernel=kernel, C=C)
+	clf.fit(x_train, y_train)
+	print("SUPPORT VECTOR MACHINE")
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_train, y_train)
+	print("training accuracy: " + str(accuracy))
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_test, y_test)
+	print("testing accuracy: " + str(accuracy))
+
+	return clf
+
+def decisionTree(x_train, y_train, x_test, y_test, max_depth = 15):
+	clf = tree.DecisionTreeClassifier(max_depth = max_depth)
+	clf.fit(x_train, y_train)
+	print("DECISION TREE")
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_train, y_train)
+	print("training accuracy: " + str(accuracy))
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_test, y_test)
+	print("testing accuracy: " + str(accuracy))
+
+	return clf
+
+def linearDiscriminantAnalysis(x_train, y_train, x_test, y_test):
+	clf = LinearDiscriminantAnalysis()
+	clf.fit(x_train, y_train)
+	print("LINEAR DISCRIMINANT ANALYSIS")
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_train, y_train)
+	print("training accuracy: " + str(accuracy))
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_test, y_test)
+	print("testing accuracy: " + str(accuracy))
+
+	return clf
+
+def knn(x_train, y_train, x_test, y_test, n_neighbors=20):
+	clf = KNeighborsClassifier(n_neighbors=n_neighbors)
+	clf.fit(x_train, y_train)
+	print("KNN")
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_train, y_train)
+	print("training accuracy: " + str(accuracy))
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_test, y_test)
+	print("testing accuracy: " + str(accuracy))
+
+	return clf
+
+def svm_pca(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=.8, n_components=5):
+	pca = PCA(n_components=n_components)
+	x_train_new = pca.fit_transform(x_train)
+	x_test_new = pca.transform(x_test)
+	clf = SVC(gamma = gamma, kernel=kernel, C=C)
+	clf.fit(x_train_new, y_train)
+	print("SUPPORT VECTOR MACHINE WITH PCA")
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_train_new, y_train)
+	print("training accuracy: " + str(accuracy))
+	accuracy, confusion_m = evaluateClassificationModel(clf, x_test_new, y_test)
+	print("testing accuracy: " + str(accuracy))
+
+	return clf
+
 def main(normalize=False, binary_encode=False, filter=False):
 	non_categorical_columns = get_all_non_categorical()
 	categorical_columns = get_all_categorical()
@@ -113,10 +198,40 @@ def main(normalize=False, binary_encode=False, filter=False):
 		non_categorical_columns, categorical_columns, 
 		normalize=normalize, binary_encode=binary_encode, filter=filter)
 	# Run Models
-	linearRegression(x_train, y_train, x_test, y_test)
-	linearRegression_L2(x_train, y_train, x_test, y_test, alpha=1.0)
-	reg = linearRegression_L1(x_train, y_train, x_test, y_test, alpha=0.1)
-	coefficients = reg.coef_
+	# REGRESSION
+	# linearRegression(x_train, y_train, x_test, y_test)
+	# linearRegression_L2(x_train, y_train, x_test, y_test, alpha=1.0)
+	# linearRegression_L1(x_train, y_train, x_test, y_test, alpha=0.1)
+	c_list = [0.01, 0.1, 0.2, 0.3, 0.5, .7, 0.75, 0.8, 0.85, .9, 0.95, 1, 1.5, 2]
+	dev_accuracy_list = []
+	train_accuracy_list = []
+	for c in c_list:
+		print("--------------------------------------------------")
+		print(c)
+		reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev = supportVectorRegression(x_train, y_train, x_test, y_test, C=c, kernel='rbf', epsilon=0.1, shrinking=True)
+		dev_accuracy_list.append(accuracy_dev)
+		train_accuracy_list.append(accuracy_train)
+		print("--------------------------------------------------")
+	plt.figure()
+	plt.plot(c_list, dev_accuracy_list, label = "Dev Accuracy")
+	plt.plot(c_list, train_accuracy_list, label = "Train Accuracy")
+	plt.legend()
+	#plt.ylim(0, 0.6)
+	plt.title("Support Vector Regression: Penalty Parameter vs. Accuracy")
+	plt.savefig("SupportVectorRegression_C_vs_Accuracy")
+	plt.xlabel("Penalty parameter C")
+	plt.show()
+	# CLASSIFICATION
+	k = 10
+	y_train = convertToClass(y_train, k)
+	y_test = convertToClass(y_test, k)
+	y_test_unseen = convertToClass(y_test_unseen, k)
+	# Run Models
+	# softmax(x_train, y_train, x_test, y_test, penalty='l2', C=1.0)
+	# svm(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=.8)
+	# decisionTree(x_train, y_train, x_test, y_test, max_depth = 15)
+	# linearDiscriminantAnalysis(x_train, y_train, x_test, y_test)
+	# knn(x_train, y_train, x_test, y_test, n_neighbors=20)
+	# svm_pca(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=.8, n_components=5)
 
-
-main(normalize=False, binary_encode=False, filter=False)
+main(normalize=True, binary_encode=True, filter=True)
