@@ -83,6 +83,22 @@ def model_p_37_5():
                     lr = 0.01,
                     name = "model_37_5")
 
+def new_model():
+    categorical = ["industry", " state", "size range"]
+    non_categorical = ['year founded', 'current employee estimate', 'reviews', 'salaries', 'interviews','total employee estimate', 'market_cap', 'enterprise_value', 'trailing_pe', 'forward_pe', 'peg_ratio_5', 'price_sales', 'price_book', 'enterprise_value_revenue', 'enterprise_value_ebitda', 'profit_margin', 'operating_margin', 'return_on_assets', 'return_on_equity', 'revenue',
+                           'revenue_per_share', 'quarterly_revenue_share', 'gross_profit', 'ebitda', 'net_income_avi_to_common', 'diluted_eps', 'quarterly_earnings_growth', 'total_cash', 'total_cash_per_share', 'total_dept', 'total_dept_per_equity', 'operating_cash_flow', 'leveraged_free_cash_flow', 'stock_beta_3y', 'stock 52_week', 'stock_sp500_52_week', 'stock_52_week_high', 'stock_52_week_low']
+    
+    net_args = [[50, 30]]
+    return ModelParams(categorical = categorical ,
+                    non_categorical = non_categorical,
+                    binary_encode = True,
+                    use_trends = True,
+                    nn = Net2,
+                    nn_args = net_args,
+                    weight_decay = 0.04,
+                    lr = 0.005,
+                    name = "new_model")
+
 
 def model_linkedin():
    
@@ -116,7 +132,9 @@ def train_model_with_parapeters(model_p, save_stats  = True):
     
 
     X_train, y_train, X_dev, y_dev, X_test, y_test = load_and_clean(
-        non_categorical, categorical, normalize = True, binary_encode = binary_encode, trend_features = use_trends)
+        non_categorical, categorical, normalize = True, binary_encode = binary_encode, trend_features = use_trends, filter = True)
+    
+    print("STD^2", np.std(y_dev)**2)
     
     m = X_train.shape[1]
 
@@ -125,6 +143,7 @@ def train_model_with_parapeters(model_p, save_stats  = True):
     X_var = Variable(torch.Tensor(X_train.to_numpy()))
     Y_var = Variable(torch.Tensor(y_train.to_numpy()))
     X_dev_var = Variable(torch.Tensor(X_dev.to_numpy()))
+    X_test_var = Variable(torch.Tensor(X_test.to_numpy()))
 
     loss_function = nn.MSELoss()
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay = weight_decay)
@@ -141,15 +160,20 @@ def train_model_with_parapeters(model_p, save_stats  = True):
      
         if save_stats:
             y_pred_dev = model(X_dev_var).data.numpy()
+            y_pred_test = model(X_test_var).data.numpy()
             dev_acc = accuracy(y_pred_dev, y_dev)
             dev_loss = mean_squared_error(y_pred_dev, y_dev)
             train_acc = accuracy(y_pred.data.numpy(), y_train)
+            test_acc = accuracy(y_pred_test, y_test)
+            test_loss = mean_squared_error(y_pred_test, y_test)
 
             learn_stats["train_loss"][i] = loss
             learn_stats["train_accuracy"][i] = train_acc
             learn_stats["dev_loss"][i] = dev_loss
             learn_stats["dev_accuracy"][i] = dev_acc
-            print("Iteration = {} Accuracy  = {} Loss = {}".format(i, dev_acc, dev_loss))
+            #learn_stats["test_loss"][i] = test_loss
+            #learn_stats["test_accuracy"][i] = test_acc
+            print("i : {}, dev_acc : {}, dev loss {}, train_acc {}".format(i, dev_acc, dev_loss, train_acc))
         else:
             print("Iteration = {} Loss = {}".format(i, loss))
     
@@ -169,7 +193,7 @@ def train_model_with_parapeters(model_p, save_stats  = True):
 def main():
     torch.manual_seed(1)
 
-    model_params = [model_p_37_5(), model_linkedin()]
+    model_params = [new_model()]
 
     for model_p in model_params:
         train_model_with_parapeters(model_p)
