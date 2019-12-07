@@ -136,9 +136,9 @@ def load_and_clean(non_categorical, categorical, data_path="../data/with_stock_d
         X.loc[:, :] = preprocessing.StandardScaler().fit_transform(X)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=1)
+        X, y, test_size=0.3, random_state=1)
     X_dev, X_test, y_dev, y_test = train_test_split(
-        X_test, y_test, test_size=.3, random_state=1)
+        X_test, y_test, test_size=.5, random_state=1)
 
     return (X_train, y_train, X_dev, y_dev, X_test, y_test)
 
