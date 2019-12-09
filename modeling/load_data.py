@@ -147,5 +147,29 @@ def convert_to_class(y_data, k):
     return y_data.apply(lambda x : np.floor(x / 5  * k - eps).astype(int))
 
 
+def upsample(X, y):
+    value_counts = np.bincount(y)
+    M = np.max(value_counts)
+    
+    labels = np.unique(y)
+    
+    new_X = np.zeros([M * labels.shape[0], X.shape[1]])
+    new_y = np.zeros(M * labels.shape[0])
+    
+    for i, label in enumerate(labels):
+        indices = np.where(y == label)[0]
+        sampled_indices = np.random.choice(indices, M)
+        new_X[i * M : (i+1)*M, :] = X[sampled_indices]
+        new_y[i * M : (i+1)*M] = y[sampled_indices]
+
+    indices = np.arange(new_X.shape[0])
+    np.random.shuffle(indices)
+    new_X = new_X[indices]
+    new_y = new_y[indices]
+
+    return (new_X, new_y)
+
+        
+
 if __name__ == "__main__":
     print(load_and_clean(["current employee estimate", "year founded"],[])[0].shape)
