@@ -1,0 +1,45 @@
+LINEAR REGRESSION
+On Training Data:
+training accuracy: 0.7386363636363636
+training MSE: 0.07409263792719505
+On Test Data:
+testing accuracy: 0.345
+testing MSE: 0.32858895534884863
+LINEAR REGRESSION L2
+training accuracy: 0.4090909090909091
+training MSE: 0.23780954738885038
+ON Test Data:
+testing accuracy: 0.405
+testing MSE: 0.2013472220084405
+LINEAR REGRESSION L1
+On Training Data:
+training accuracy: 0.416958041958042
+training MSE: 0.22275683082678738
+ON Test Data:
+testing accuracy: 0.415
+testing MSE: 0.19026443253203895
+SUPPORT VECTOR REGRESSION
+On Training Data:
+training accuracy: 0.5174825174825175
+training MSE: 0.17378815814353613
+On Test Data:
+testing accuracy: 0.41
+testing MSE: 0.20411650840029225
+SOFTMAX
+training accuracy: 0.36713286713286714
+testing accuracy: 0.385
+SUPPORT VECTOR MACHINE
+training accuracy: 0.861013986013986
+testing accuracy: 0.375
+DECISION TREE
+training accuracy: 0.9816433566433567
+testing accuracy: 0.335
+LINEAR DISCRIMINANT ANALYSIS
+training accuracy: 0.8583916083916084
+testing accuracy: 0.36
+KNN
+training accuracy: 0.44493006993006995
+testing accuracy: 0.36
+SUPPORT VECTOR MACHINE WITH PCA
+training accuracy: 0.8575174825174825
+testing accuracy: 0.37

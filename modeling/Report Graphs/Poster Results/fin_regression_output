@@ -1,0 +1,40 @@
+LINEAR REGRESSION
+On Training Data:
+training accuracy: 0.4423076923076923
+training MSE: 0.20924441921263884
+On Dev Data:
+testing accuracy: 0.435
+testing MSE: 0.21053029238702015
+On Test Data
+testing unseen accuracy: 0.4367816091954023
+testing unseen MSE: 0.2848386192599376
+LINEAR REGRESSION L2
+On Training Data:
+training accuracy: 0.44143356643356646
+training MSE: 0.20924505903302656
+On Dev Data:
+testing accuracy: 0.435
+testing MSE: 0.21199322748303076
+On Test Data
+testing unseen accuracy: 0.4367816091954023
+testing unseen MSE: 0.28344927272333564
+LINEAR REGRESSION L1
+On Training Data:
+training accuracy: 0.42395104895104896
+training MSE: 0.21281935476680006
+On Dev Data:
+testing accuracy: 0.445
+testing MSE: 0.18250368931118502
+On Test Data
+testing unseen accuracy: 0.3793103448275862
+testing unseen MSE: 0.2695787094375458
+SUPPORT VECTOR REGRESSION
+On Training Data:
+training accuracy: 0.7124125874125874
+training MSE: 0.11154843979260817
+On Dev Data:
+testing accuracy: 0.485
+testing MSE: 0.18668401320667713
+On Test Data
+testing unseen accuracy: 0.367816091954023
+testing unseen MSE: 0.24316938101326

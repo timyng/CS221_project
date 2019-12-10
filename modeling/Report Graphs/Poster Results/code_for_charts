@@ -1,0 +1,59 @@
+	c_list = [0.01, 0.1, 0.2, 0.3, 0.5, .7, 0.75, 0.8, 0.85, .9, 0.95, 1, 1.5, 2]
+	dev_accuracy_list = []
+	train_accuracy_list = []
+	for c in c_list:
+		print("--------------------------------------------------")
+		print(c)
+		reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev = supportVectorRegression(x_train, y_train, x_test, y_test, C=c, kernel='rbf', epsilon=0.1, shrinking=True)
+		dev_accuracy_list.append(accuracy_dev)
+		train_accuracy_list.append(accuracy_train)
+		print("--------------------------------------------------")
+	plt.figure()
+	plt.plot(c_list, dev_accuracy_list, label = "Dev Accuracy")
+	plt.plot(c_list, train_accuracy_list, label = "Train Accuracy")
+	plt.legend()
+	#plt.ylim(0, 0.6)
+	plt.title("Support Vector Regression: Penalty Parameter vs. Accuracy")
+	plt.savefig("SupportVectorRegression_C_vs_Accuracy")
+	plt.xlabel("Penalty parameter C")
+	plt.show()
+
+	c_list = [1, 5, 10, 15, 20, 25, 30, 40, 45, 50, 55, 60, 75, 80, 85]
+	dev_accuracy_list = []
+	train_accuracy_list = []
+	for c in c_list:
+		print("--------------------------------------------------")
+		print(c)
+		clf, train_accuracy, train_confusion_m, dev_accuracy, dev_confusion_m = svm_pca(x_train, y_train, x_test, y_test, gamma = 'auto', kernel='rbf', C=1.5, n_components=c)
+		dev_accuracy_list.append(dev_accuracy)
+		train_accuracy_list.append(train_accuracy)
+		print("--------------------------------------------------")
+	plt.figure()
+	plt.plot(c_list, dev_accuracy_list, label = "Dev Accuracy")
+	plt.plot(c_list, train_accuracy_list, label = "Train Accuracy")
+	plt.legend()
+	#plt.ylim(0, 0.6)
+	plt.title("Support Vector Machine: Number of PCA components vs. Accuracy")
+	plt.savefig("SupportVectorMachineComponentsPCA_vs_Accuracy")
+	plt.xlabel("Number of PCA components")
+	plt.show()
+
+	c_list = [1, 5, 10, 15, 20, 25, 30, 40, 45, 50, 55, 60, 75, 80, 100]
+	dev_accuracy_list = []
+	train_accuracy_list = []
+	for c in c_list:
+		print("--------------------------------------------------")
+		print(c)
+		reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev = supportVectorRegressionPCA(x_train, y_train, x_test, y_test, C=0.9, kernel='rbf', epsilon=0.1, shrinking=True, n_components=5)
+		dev_accuracy_list.append(accuracy_dev)
+		train_accuracy_list.append(accuracy_train)
+		print("--------------------------------------------------")
+	plt.figure()
+	plt.plot(c_list, dev_accuracy_list, label = "Dev Accuracy")
+	plt.plot(c_list, train_accuracy_list, label = "Train Accuracy")
+	plt.legend()
+	#plt.ylim(0, 0.6)
+	plt.title("Support Vector Regression: Number of PCA components vs. Accuracy")
+	plt.savefig("SupportVectorMachineComponentsPCA_vs_Accuracy")
+	plt.xlabel("Number of PCA components")
+	plt.show()
