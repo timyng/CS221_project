@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import lightgbm as lgb
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import cross_val_score
@@ -16,6 +17,7 @@ from sklearn import tree
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeRegressor
 from sklearn.decomposition import PCA
 from sklearn.linear_model import Ridge
 from sklearn.svm import SVR
@@ -58,6 +60,24 @@ def evaluateClassificationModel(model, x, y):
     # print(confusion_m)
     # print("")
     return (accuracy, confusion_m)
+
+def decisionTreeRegressor(x_train, y_train, x_dev, y_dev, x_test, y_test, max_depth=None):
+	reg = DecisionTreeRegressor(max_depth=max_depth)
+	reg.fit(x_train, y_train)
+	print("DECISION TREE REGRESSOR")
+	mse_train, accuracy_train, confusion_m_train = evaluateRegressionModel(reg, x_train, y_train)
+	print("training accuracy: " + str(accuracy_train))
+	print("training MSE: " + str(mse_train))
+
+	mse_dev, accuracy_dev, confusion_m_dev = evaluateRegressionModel(reg, x_dev, y_dev)
+	print("dev accuracy: " + str(accuracy_dev))
+	print("dev MSE: " + str(mse_dev))
+
+	mse_test, accuracy_test, confusion_m_test = evaluateRegressionModel(reg, x_test, y_test)
+	print("test accuracy: " + str(accuracy_test))
+	print("test MSE: " + str(mse_test))
+
+	return reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev, mse_test, accuracy_test, confusion_m_test
 
 def linearRegression_L1(x_train, y_train, x_dev, y_dev, x_test, y_test, alpha=0.1):
 	reg = linear_model.Lasso(alpha=alpha)
@@ -131,6 +151,7 @@ def supportVectorRegression(x_train, y_train, x_dev, y_dev, x_test, y_test, C=0.
 def supportVectorRegressionPCA(x_train, y_train, x_dev, y_dev, x_test, y_test, C=0.1, kernel='rbf', epsilon=0.1, shrinking=True, n_components=5):
 	pca = PCA(n_components=n_components)
 	x_train = pca.fit_transform(x_train)
+	x_dev = pca.transform(x_dev)
 	x_test = pca.transform(x_test)
 	
 	reg = SVR(C=C, kernel=kernel, epsilon=epsilon, shrinking=shrinking)
@@ -150,7 +171,7 @@ def supportVectorRegressionPCA(x_train, y_train, x_dev, y_dev, x_test, y_test, C
 	return reg, mse_train, accuracy_train, confusion_m_train, mse_dev, accuracy_dev, confusion_m_dev, mse_test, accuracy_test, confusion_m_test
 
 def softmax(x_train, y_train, x_dev, y_dev, x_test, y_test, penalty='l2', C=1.0):
-	clf = LogisticRegression(multi_class='multinomial', solver='lbfgs', C=C)
+	clf = LogisticRegression(multi_class='multinomial', solver='lbfgs', C=C, penalty=penalty)
 	clf.fit(x_train, y_train)
 	print("SOFTMAX")
 	accuracy_train, confusion_m_train = evaluateClassificationModel(clf, x_train, y_train)
@@ -202,6 +223,19 @@ def linearDiscriminantAnalysis(x_train, y_train, x_dev, y_dev, x_test, y_test):
 
 	return clf, accuracy_train, confusion_m_train, accuracy_dev, confusion_m_dev, accuracy_test, confusion_m_test
 
+def quadraticDiscriminantAnalysis(x_train, y_train, x_dev, y_dev, x_test, y_test):
+	clf = QuadraticDiscriminantAnalysis()
+	clf.fit(x_train, y_train)
+	print("QUADRATIC DISCRIMINANT ANALYSIS")
+	accuracy_train, confusion_m_train = evaluateClassificationModel(clf, x_train, y_train)
+	print("training accuracy: " + str(accuracy_train))
+	accuracy_dev, confusion_m_dev = evaluateClassificationModel(clf, x_dev, y_dev)
+	print("dev accuracy: " + str(accuracy_dev))
+	accuracy_test, confusion_m_test = evaluateClassificationModel(clf, x_test, y_test)
+	print("test accuracy: " + str(accuracy_test))
+
+	return clf, accuracy_train, confusion_m_train, accuracy_dev, confusion_m_dev, accuracy_test, confusion_m_test
+
 def knn(x_train, y_train, x_dev, y_dev, x_test, y_test, n_neighbors=20):
 	clf = KNeighborsClassifier(n_neighbors=n_neighbors)
 	clf.fit(x_train, y_train)
@@ -232,6 +266,19 @@ def svm_pca(x_train, y_train, x_dev, y_dev, x_test, y_test, gamma = 'auto', kern
 
 	return clf, accuracy_train, confusion_m_train, accuracy_dev, confusion_m_dev, accuracy_test, confusion_m_test
 
+def lightgradientboosting(x_train, y_train, x_dev, y_dev, x_test, y_test, n_estimators=700, application='multiclass', lambda_l2=10.0, bagging_fraction=0.6, bagging_freq=1, num_class=10, max_depth=-1, num_leaves=31):
+	clf = lgb.LGBMClassifier(n_estimators=n_estimators, application=application, lambda_l2=lambda_l2, bagging_fraction=bagging_fraction, bagging_freq=bagging_freq, num_class=num_class, max_depth=max_depth, num_leaves=num_leaves)
+	clf.fit(x_train, y_train)
+	print("GRADIENT BOOSTING WITH DECISION STUMPS")
+	accuracy_train, confusion_m_train = evaluateClassificationModel(clf, x_train, y_train)
+	print("training accuracy: " + str(accuracy_train))
+	accuracy_dev, confusion_m_dev = evaluateClassificationModel(clf, x_dev, y_dev)
+	print("dev accuracy: " + str(accuracy_dev))
+	accuracy_test, confusion_m_test = evaluateClassificationModel(clf, x_test, y_test)
+	print("test accuracy: " + str(accuracy_test))
+
+	return clf, accuracy_train, confusion_m_train, accuracy_dev, confusion_m_dev, accuracy_test, confusion_m_test
+
 def main(normalize=False, binary_encode=False, filter=False):
 	non_categorical_columns = get_all_non_categorical()
 	categorical_columns = get_all_categorical()
@@ -253,7 +300,7 @@ def main(normalize=False, binary_encode=False, filter=False):
 	y_dev = convertToClass(y_dev, k)
 	y_test = convertToClass(y_test, k)
 	# Run Models
-	softmax(x_train, y_train, x_dev, y_dev, x_test, y_test, penalty='l1', C=0.8)
+	softmax(x_train, y_train, x_dev, y_dev, x_test, y_test, penalty='l2', C=0.8)
 	svm(x_train, y_train, x_dev, y_dev, x_test, y_test, gamma = 'auto', kernel='rbf', C=1.5)
 	svm(x_train, y_train, x_dev, y_dev, x_test, y_test, gamma = 'auto', kernel='linear', C=0.01)
 	decisionTree(x_train, y_train, x_dev, y_dev, x_test, y_test, max_depth = 14)
@@ -261,4 +308,5 @@ def main(normalize=False, binary_encode=False, filter=False):
 	knn(x_train, y_train, x_dev, y_dev, x_test, y_test, n_neighbors=35)
 	svm_pca(x_train, y_train, x_dev, y_dev, x_test, y_test, gamma = 'auto', kernel='rbf', C=1.0, n_components=5)
 
-main(normalize=True, binary_encode=True, filter=True)
+if __name__ == "__main__":
+	main(normalize=True, binary_encode=True, filter=True)
