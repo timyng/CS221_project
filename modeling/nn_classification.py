@@ -50,8 +50,8 @@ class NN_2(nn.Module):
     def __init__(self, num_input, num_output):
         super().__init__()
 
-        self.fc1 = nn.Linear(num_input, 40)
-        self.fc2 = nn.Linear(40, num_output)
+        self.fc1 = nn.Linear(num_input, 50)
+        self.fc2 = nn.Linear(50, num_output)
         #self.fc3 = nn.Linear(25, num_output)
         self.training = True
 
@@ -113,7 +113,7 @@ class NN_clf:
 
         self.model.apply(weights_init_uniform)
         
-        self.optimizer = optim.SGD(self.model.parameters(), lr=0.005, momentum=0.9, weight_decay = weight_decay)
+        self.optimizer = optim.SGD(self.model.parameters(), lr=0.05, momentum=0.9, weight_decay = weight_decay)
 
     def fit(self, X, y, dev_X = None, dev_y = None):
         m = X.shape[1]
@@ -147,7 +147,7 @@ class NN_clf:
                 loss.backward()
                 self.optimizer.step()
 
-            if i % 20 == 0:
+            if dev_X is not None and i % 20 == 0:
                 dev_acc = self.score(dev_X, dev_y)
                 train_acc = self.score(X, y)
                 print("i = {} train accuracy = {:.3f}, dev accuracy = {:.3f}".format(i, train_acc, dev_acc))
@@ -158,14 +158,14 @@ class NN_clf:
         return accs
 
     def predict(self, X):
-        self.training = False
+        self.model.training = False
         X_var = Variable(torch.Tensor(X))
         result = None
         if self.regression:
             result = self.model(X_var).data.numpy()
         else:
             result =  np.apply_along_axis(np.argmax, 1, self.model(X_var).data.numpy())
-        self.training = True
+        self.model.training = True
         return result
 
     def score(self, X, y):
@@ -211,8 +211,8 @@ def run_regression(train_X, train_y, dev_X, dev_y):
         plt.close()
 
 def run_classification(train_X, train_y, dev_X, dev_y):
-    weight_values = np.linspace(0.02, 0, 10)
-    scores = np.zeros_like(weight_values)
+    weight_values = np.linspace(0.5,0, 20)
+    scores = np.zeros((2, weight_values.shape[0]))
     for i,weight_value in enumerate(weight_values):
         clf = NN_clf(train_X.shape[1], 10,weight_value)
         accs = clf.fit(train_X, train_y, dev_X, dev_y)
@@ -226,12 +226,29 @@ def run_classification(train_X, train_y, dev_X, dev_y):
         plt.legend()
         plt.title("NN classifier weight_decay = {}".format(weight_value))
         plt.savefig("{}/nn_train_{}.png".format(OUT_BASE, weight_value))
-        scores[i] = clf.score(dev_X, dev_y)
+        scores[0][i] = clf.score(train_X, train_y)
+        scores[1][i] = clf.score(dev_X, dev_y)
+        #print("Result", scores[i], weight_value)
         plt.close()
         #y_pred = clf.predict(dev_X)
         #save_confusion_m(y_pred, dev_y,"Neural Net classifier {}".format(weight_value),y2[-1])
-    
+    return scores
 
+
+
+def upsample_test(train_X, train_y, dev_X, dev_y, test_X, test_y):
+    print(train_X.shape)
+    train_X, train_y_class = upsample(train_X, train_y)
+    print(train_X.shape)
+    clf = NN_clf(train_X.shape[1], 10,0.01)
+    clf.fit(train_X, train_y_class, dev_X, dev_y)
+
+    print("test", clf.score( train_X, train_y_class))
+    print("dev",clf.score( dev_X, dev_y))
+    print("test", clf.score( test_X, test_y))
+
+    y_pred = clf.predict(test_X)
+    save_confusion_m(y_pred, test_y, "NN upsampled", clf.score( test_X, test_y))
 
 
 def main():
@@ -266,10 +283,36 @@ def main():
     dev_y = dev_y.to_numpy().flatten()
     test_y = test_y.to_numpy().flatten()
 
+    
 
+    #train_X, train_y_class = upsample(train_X, train_y_class)
+    #res = run_classification(train_X, train_y_class, dev_X, dev_y_class)
+    
+    upsample_test(train_X, train_y_class, dev_X, dev_y_class, test_X,test_y_class)
+    #clf = NN_clf(train_X.shape[1], 10,0.0058)
+
+    #clf = NN_clf(train_X.shape[1], 10,0.0058)
+
+    #clf = NN_clf(train_X.shape[1], 10,0.01)
+
+    #clf.fit(train_X, train_y_class, dev_X, dev_y_class)
+    #print(clf.score(train_X, train_y_class))
+    #print(clf.score(dev_X, dev_y_class))
+    #print(clf.score(test_X, test_y_class))
+#
+    #y_pred = clf.predict(test_X)
+    #save_confusion_m(y_pred, test_y_class, "NN", clf.score( test_X, test_y))
     #run_regression(train_X, train_y, dev_X, dev_y)
-    train_X, train_y_class = upsample(train_X, train_y_class)
-    run_classification(train_X, train_y_class, dev_X, dev_y_class)
+    
+    
+    #x = np.linspace(0.2,0,20)
+    #plt.plot(x,res[0],label =  "Train")
+    #plt.plot(x, res[1], label = "Test")
+    #plt.title("Adding regularization")
+    #plt.xlabel("Weight_decay")
+    #plt.ylabel("Accuracy")
+    #plt.savefig("{}/weight_decay.png".format(OUT_BASE))
+    #plt.show()
 
 
 
