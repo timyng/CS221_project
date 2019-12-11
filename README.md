@@ -26,6 +26,5 @@ To run the neural net:
 
 ```python nn_classifier.py```
 
-
 ## Notebooks
-The notebooks contains 
+In the modeling directory contains several Jupiter Notebooks that was used for data exploration in the early stages of the project.
