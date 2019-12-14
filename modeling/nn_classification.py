@@ -288,17 +288,21 @@ def main():
     #train_X, train_y_class = upsample(train_X, train_y_class)
     #res = run_classification(train_X, train_y_class, dev_X, dev_y_class)
     
-    upsample_test(train_X, train_y_class, dev_X, dev_y_class, test_X,test_y_class)
+    #upsample_test(train_X, train_y_class, dev_X, dev_y_class, test_X,test_y_class)
     #clf = NN_clf(train_X.shape[1], 10,0.0058)
 
-    #clf = NN_clf(train_X.shape[1], 10,0.0058)
+    clf = NN_clf(train_X.shape[1], 10,0.058)
 
     #clf = NN_clf(train_X.shape[1], 10,0.01)
 
-    #clf.fit(train_X, train_y_class, dev_X, dev_y_class)
-    #print(clf.score(train_X, train_y_class))
-    #print(clf.score(dev_X, dev_y_class))
-    #print(clf.score(test_X, test_y_class))
+    clf.fit(train_X, train_y_class, dev_X, dev_y_class)
+    print(clf.score(train_X, train_y_class))
+    print(clf.score(dev_X, dev_y_class))
+    print(clf.score(test_X, test_y_class))
+
+    y_pred = clf.predict(test_X)
+    save_confusion_m(y_pred , test_y_class, "NN", clf.score(test_X, test_y_class))
+
 #
     #y_pred = clf.predict(test_X)
     #save_confusion_m(y_pred, test_y_class, "NN", clf.score( test_X, test_y))
